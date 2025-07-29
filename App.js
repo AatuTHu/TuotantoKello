@@ -1,11 +1,28 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet,View } from 'react-native';
+import Timer from './components/screens/Timer';
+import Controller from './components/Controller';
+import InvalidScreen from './components/screens/InvalidScreen';
+import Printer from './components/screens/Printer';
+import Settings from './components/screens/Settings';
+import Navigation from './service/contexts/NavigationContext';
+import StateContext from './service/contexts/StateContext';
+import Analytics from './components/screens/Analytics';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <StatusBar style="auto"/>
+      <StateContext>  
+          <Navigation>
+            <InvalidScreen/>
+            <Controller/>
+            <Timer/>
+            <Printer/>
+            <Settings/>
+            <Analytics/>
+          </Navigation>
+      </StateContext>
     </View>
   );
 }
@@ -13,8 +30,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#09122C',
     alignItems: 'center',
     justifyContent: 'center',
-  },
+  }
 });
