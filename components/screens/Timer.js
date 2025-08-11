@@ -7,6 +7,7 @@ import { useStates } from '../../service/contexts/StateContext';
 import { useNavigation } from '../../service/contexts/NavigationContext';
 import TopBar from '../TopBar'
 const STORAGE_KEY = "timer_start_time";
+const STORAGE_PHASES_KEY = "phase_names";
 
 const Timer = () => {
   // State hooks for various functionalities
@@ -17,7 +18,9 @@ const Timer = () => {
   const [phaseName, setPhaseName] = useState('');
   const [userName, setUserName] = useState('');
   const [phases, setPhases] = useState([]);
+  const [selectablePhases, setSelectablePhases] = useState([]);
   const [category, setCategory] = useState("")
+  const [phaseDropDownVisible, setPhaseDropDownVisible] = useState(false);
 
   const inputRef = useRef(null);
   const mainTitleInputRef = useRef(null);
@@ -26,8 +29,10 @@ const Timer = () => {
   const { existingTitle, existingPhases, setExistingTitle, setExistingPhases } = useStates()
   const { setNavigate } = useNavigation()
 
-  // Load the stored start time from AsyncStorage on component mount
+
+  // Load the stored start time and phases from AsyncStorage on component mount
   useEffect(() => {
+    loadPhases();
     loadStartTime();
   }, []);
 
@@ -82,6 +87,21 @@ const Timer = () => {
     }
   };
 
+  //load phases from AsyncStorage
+ const loadPhases = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('phase_names');
+      if (saved) {
+        setSelectablePhases(JSON.parse(saved));
+      } else {
+        setSelectablePhases([]); // jos ei löydy mitään
+      }
+    } catch (error) {
+      console.error('Virhe ladattaessa vaiheita:', error);
+      setSelectablePhases([]); // virhetilanteessa tyhjä lista
+    }
+  };
+
   // Toggle timer start/stop and save start time to AsyncStorage
   const handleStartStop = async () => {
     if (!isRunning) {
@@ -107,18 +127,21 @@ const Timer = () => {
   // Save a new phase to the list of phases
   const savePhase = () => {
     if (phaseName.trim() === '') {
-      inputRef.current.focus();
-      inputRef.current.setNativeProps({ style: { borderColor: 'red' } });
+      handleReset();
       return;
     }
-
     const newPhase = { phaseName, time: seconds };
     setPhases([...phases, newPhase]);
     setPhaseName("");
     setIsRunning(false);
     setSeconds(0);
-    inputRef.current.setNativeProps({ style: { borderColor: '#ccc' } });
   };
+
+  // Save a new phase with a specific name
+  const savePhaseName = (name) => {
+    setPhaseName(name);
+    setPhaseDropDownVisible(false);
+  }
 
   // Save the main title and phases, and update AsyncStorage
   const saveMainTitleWithPhases = async () => {
@@ -206,6 +229,8 @@ const Timer = () => {
         </TouchableOpacity>
       </View>
 
+       
+
       {/* Main Title Input */}
       <TextInput
         ref={mainTitleInputRef}
@@ -220,21 +245,39 @@ const Timer = () => {
 
       {/* Phase Name Input */}
       <View style={[styles.nappilaatikko,{ width:"80%"}]}>
-        <TextInput
-          ref={inputRef}
-          style={[styles.input, {width:"75%"}]}
-          placeholder="Vaiheen nimi"
-          value={phaseName}
-          onChangeText={(text) => {
-            setPhaseName(text);
-            inputRef.current.setNativeProps({ style: { borderColor: '#ccc' } });
-          }}
-        />
-          {/* Add Phase Button */}
-        <TouchableOpacity onPress={savePhase} style={{marginRight:15}}>
-           <Ionicons name="add-circle-outline" size={50} color={"#027554"}/>
+        {selectablePhases.length > 0 && (
+          <TouchableOpacity onPress={ () => setPhaseDropDownVisible(!phaseDropDownVisible)} style={[styles.nappula, { width: '30%' }]}>
+            <Text style={styles.nappulaText}>Vaiheet</Text>
+          </TouchableOpacity>
+        )}
+
+      { (isRunning && selectablePhases.length > 0) && (
+        <TouchableOpacity onPress={savePhase} style={[styles.nappula,{ backgroundColor: '#005B41' }]}>
+        <Text style={styles.nappulaText}>Tallenna vaihe</Text>
         </TouchableOpacity>
+      )}
       </View>
+      
+      <View style={{flexDirection:"row", width:"80%", flexWrap:"wrap"}}>
+        { phaseName.length > 0 && (
+         <>
+          <Text style={styles.phaseText}>Mitataan aikaa vaiheelle:  </Text>
+          <Text style={[styles.phaseText,{fontWeight:"bold", color:"red"}]}>{phaseName}</Text>
+         </>
+        )}
+
+      </View>
+
+      {/*Dropdown where user selects phases*/}
+        { phaseDropDownVisible && (
+          <View style={{ width: '80%', justifyContent: 'space-between', marginTop: 10 }}>
+          {selectablePhases.map((phase, index) => (    
+            <TouchableOpacity key = {index} style={styles.buttonText} onPress={() => savePhaseName(phase)}>
+              <Text style={[styles.nappulaText,{padding:2}]}>{phase}</Text>
+            </TouchableOpacity>  
+          ))}
+        </View>
+        )}
 
      
 

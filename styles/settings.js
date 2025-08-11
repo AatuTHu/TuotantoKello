@@ -40,5 +40,26 @@ export const styles = StyleSheet.create({
     borderRadius: 100,
     marginBottom: 10,
     marginTop: 10,
-  }
+  },
+  tagButton:{
+    backgroundColor: '#747070b4',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    margin: 5,
+    borderRadius: 20,
+    alignSelf: 'flex-start', // ettei veny koko riville
+    flexDirection: 'row', // mahdollistaa ikonit + tekstin
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2 // Android-varjo
+  },
+  tagText: {
+  color: '#fff',
+  fontSize: 18,
+  fontWeight: '500',
+  fontWeight:"bold"
+}
 });

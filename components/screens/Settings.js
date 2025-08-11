@@ -8,17 +8,22 @@ import { Ionicons } from '@expo/vector-icons';
 export default function Settings() {
 
   const [username, setUsername] = useState('');
-
+  const [phaseName, setPhaseName] = useState('');
+  const [selectablePhases, setSelectablePhases] = useState([]);
 
   useEffect(() => {
     try {
-      const fetchUserName = async() => {
+      const fetchfromAsyncStorage = async() => {
         const value = await AsyncStorage.getItem('username');
         if (value !== null) {
           setUsername(value);
         }
+        const savedPhases = await AsyncStorage.getItem('phase_names');
+        if (savedPhases !== null) {
+          setSelectablePhases(JSON.parse(savedPhases));
+        }
       }
-      fetchUserName();
+      fetchfromAsyncStorage();
     } catch (error) {
       console.error('Virhe luettaessa nimeä AsyncStoragesta:', error);
     }
@@ -56,16 +61,41 @@ export default function Settings() {
     }
   }
 
+const savePhaseName = async () => {
+  try {
+    const savedNames = await AsyncStorage.getItem('phase_names');
+    let namesArray = savedNames ? JSON.parse(savedNames) : [];
+    namesArray.push(phaseName);
+    setSelectablePhases(namesArray);
+    await AsyncStorage.setItem('phase_names', JSON.stringify(namesArray));
+    setPhaseName('');
+  } catch (error) {
+    console.error('Virhe tallennettaessa vaihetta AsyncStorageen:', error);
+  }
+};
+
+const deletePhase = async (phase) => {
+  try {
+    const savedNames = await AsyncStorage.getItem('phase_names');
+    let namesArray = savedNames ? JSON.parse(savedNames) : [];
+    const updatedNames = namesArray.filter(item => item !== phase);
+    await AsyncStorage.setItem('phase_names', JSON.stringify(updatedNames));
+    setSelectablePhases(updatedNames);
+  } catch (error) {
+    console.error('Virhe poistettaessa vaihetta AsyncStorageista:', error);
+  }
+  }
+
   return (
-    <View style = {styles.container}>
-      <TopBar/>
+  <View style = {styles.container}>
+    <TopBar/>
         <View style= {styles.settingContainer}>
         <Text style={styles.labelText}>Tyhjennä muisti</Text>
           <Button title='tyhjennä' onPress={clearStorage}/>
         </View>
 
-        <View style= {[styles.settingContainer, {flexDirection:'column'}]}>
-        <Text style={[styles.labelText,{textAlign:'left', width:'100%'}]}>Mittauksissa käytettävä nimi</Text>
+    <View style= {[styles.settingContainer, {flexDirection:'column'}]}>
+      <Text style={[styles.labelText,{textAlign:'left', width:'100%'}]}>Mittauksissa käytettävä nimi</Text>
         <View style= {{flexDirection:'row'}}>
           <TextInput
           style={styles.input}
@@ -80,7 +110,31 @@ export default function Settings() {
             <Ionicons name='save' size={32} color={'white'}/>
           </TouchableOpacity>
         </View>
+
+      <Text style={[styles.labelText,{textAlign:'left', width:'100%'}]}>Mittauksissa käytettäviä vaiheita</Text>
+        <View style= {{flexDirection:'row'}}>
+          <TextInput
+          style={styles.input}
+          placeholder="Vaihe"
+          placeholderTextColor={'white'}
+          onChangeText={(text) => setPhaseName(text)}
+          numberOfLines={1}
+          maxLength={25}
+          />
+          <TouchableOpacity onPress={savePhaseName} style={styles.button}>
+            <Ionicons name='save' size={32} color={'white'}/>
+          </TouchableOpacity>
         </View>
-    </View>
+
+        <View  style={{flexDirection:'row', width:'100%', flexWrap:'wrap', padding:10}}>
+        {selectablePhases.map((phase, index) => (
+            <TouchableOpacity key={index} style={styles.tagButton} >
+              <Text style={styles.tagText}>{phase}</Text>
+              <Text style={{color:"red", marginLeft: 5, fontSize:17,  }} onPress={() => deletePhase(phase)}>X</Text>
+            </TouchableOpacity>
+        ))}
+        </View>
+    </View> 
+  </View>
   )
 }
