@@ -19,7 +19,7 @@ export default function TopBar() {
 
       <TouchableOpacity style={{position:'absolute', right:10}} onPress={() => setNavigate("Settings")}>
           <Ionicons name="settings" size={27} color="#fff" />
-        </TouchableOpacity>
+      </TouchableOpacity>
     </View>
   )
 }

@@ -3,7 +3,6 @@ import { StyleSheet,View } from 'react-native';
 import Timer from './components/screens/Timer';
 import Controller from './components/Controller';
 import InvalidScreen from './components/screens/InvalidScreen';
-import Printer from './components/screens/Printer';
 import Settings from './components/screens/Settings';
 import Navigation from './service/contexts/NavigationContext';
 import StateContext from './service/contexts/StateContext';
@@ -18,7 +17,6 @@ export default function App() {
             <InvalidScreen/>
             <Controller/>
             <Timer/>
-            <Printer/>
             <Settings/>
             <Analytics/>
           </Navigation>

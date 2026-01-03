@@ -5,6 +5,7 @@ import { useNavigation } from '../service/contexts/NavigationContext';
 import { useStates } from '../service/contexts/StateContext';
 import TopBar from './TopBar';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Controller() {
 
@@ -25,7 +26,7 @@ return (
 
       <View style={styles.buttonBox}>
       <TouchableOpacity onPress={() => setNavigate('Timer')}>
-        <Ionicons name="stopwatch-outline" size={80} color="#FFFf" />
+        <Ionicons name="stopwatch-outline" size={90} color="#FFFf" />
       </TouchableOpacity>
     
     </View> 
@@ -61,6 +62,6 @@ const styles = StyleSheet.create({
       justifyContent:'space-around',
       width: '100%',
       marginTop:10,
-      marginBottom: 10,
+      marginBottom: 20,
     },
   });

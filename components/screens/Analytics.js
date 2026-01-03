@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, ScrollView, Switch, TouchableOpacity } from "react-native";
-import Slider from "@react-native-community/slider";
 import TopBar from "../TopBar";
 import { useStates } from "../../service/contexts/StateContext";
 
@@ -18,6 +17,16 @@ const formatTime = (totalSeconds) => {
     }
   }
 };
+
+const formatTimeInDays = (totalSeconds) => {
+  if (totalSeconds < 60) {
+    return ``;
+  } else {
+    const day = totalSeconds / 3600 / 7.5;
+      return `${day.toFixed(0)} päivää`;
+    
+  }
+}
 
 export default function Analytics() {
   const { selectedItems } = useStates();
@@ -142,46 +151,16 @@ export default function Analytics() {
         </View>
 
         {isValidCount && (
-          <View style={{ width: "100%", paddingHorizontal: 20 }}>
-            <Text style={styles.label}>Huomioidaanko työn rytmin tuoma tehokkuus?</Text>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-              <Switch value={useOptimization} onValueChange={setUseOptimization} />
-              <Text style={{ color: "#ccc", marginLeft: 10 }}>
-                {useOptimization ? `Kyllä (${optimizationPercent} % nopeampi)` : "Ei"}
-              </Text>
-            </View>
-
-            {useOptimization && (
-              <>
-                <Text style={styles.label}>Optimoinnin määrä: {optimizationPercent}%</Text>
-                <Slider
-                  style={{ width: "100%", height: 40 }}
-                  minimumValue={0}
-                  maximumValue={10}
-                  step={1}
-                  value={optimizationPercent}
-                  minimumTrackTintColor="#00cc99"
-                  maximumTrackTintColor="#888"
-                  thumbTintColor="#00cc99"
-                  onValueChange={setOptimizationPercent}
-                />
-              </>
-            )}
-
+          <View style={{ width: "100%", paddingHorizontal: 20 }}>      
             <Text style={styles.result}>
               Kokonaisaika ({productCount} kpl, {effectiveWorkerNum} työntekijää):
             </Text>
             <Text style={[styles.result, { color: "lightblue" }]}>
               {formatTime(optimizedTotalTime.toFixed(0))}
             </Text>
-
-            {useOptimization && (
-              <Text style={[styles.result, { color: "green" }]}>
-                Säästö: {formatTime(totalTime - optimizedTotalTime.toFixed(0))} (
-                {optimizationPercent}
-                %)
-              </Text>
-            )}
+             <Text style={[styles.result, { color: "lightblue" }]}>
+              {formatTimeInDays(optimizedTotalTime.toFixed(0))}
+            </Text>
           </View>
         )}
 
@@ -189,9 +168,6 @@ export default function Analytics() {
           <Text style={[styles.label, { marginBottom: 0 }]}>Käytetyt kaavat:</Text>
           <Text style={styles.formula}>
             Kokonaisaika = (tuotemäärä × muiden vaiheiden aika) + (vain kerran laskettavien vaiheiden aika)
-          </Text>
-          <Text style={styles.formula}>
-            Optimoitu aika = kokonaisaika × (1 − optimointi prosentti / 100)
           </Text>
         </View>
       </ScrollView>

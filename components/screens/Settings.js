@@ -18,10 +18,6 @@ export default function Settings() {
         if (value !== null) {
           setUsername(value);
         }
-        const savedPhases = await AsyncStorage.getItem('phase_names');
-        if (savedPhases !== null) {
-          setSelectablePhases(JSON.parse(savedPhases));
-        }
       }
       fetchfromAsyncStorage();
     } catch (error) {
@@ -111,29 +107,6 @@ const deletePhase = async (phase) => {
           </TouchableOpacity>
         </View>
 
-      <Text style={[styles.labelText,{textAlign:'left', width:'100%'}]}>Mittauksissa käytettäviä vaiheita</Text>
-        <View style= {{flexDirection:'row'}}>
-          <TextInput
-          style={styles.input}
-          placeholder="Vaihe"
-          placeholderTextColor={'white'}
-          onChangeText={(text) => setPhaseName(text)}
-          numberOfLines={1}
-          maxLength={25}
-          />
-          <TouchableOpacity onPress={savePhaseName} style={styles.button}>
-            <Ionicons name='save' size={32} color={'white'}/>
-          </TouchableOpacity>
-        </View>
-
-        <View  style={{flexDirection:'row', width:'100%', flexWrap:'wrap', padding:10}}>
-        {selectablePhases.map((phase, index) => (
-            <TouchableOpacity key={index} style={styles.tagButton} >
-              <Text style={styles.tagText}>{phase}</Text>
-              <Text style={{color:"red", marginLeft: 5, fontSize:17,  }} onPress={() => deletePhase(phase)}>X</Text>
-            </TouchableOpacity>
-        ))}
-        </View>
     </View> 
   </View>
   )
