@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
       justifyContent:'space-around',
       width: '100%',
       marginTop:10,
-      marginBottom: 20,
+      marginBottom: 60,
     },
   });

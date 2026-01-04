@@ -184,7 +184,7 @@ const Timer = () => {
           }
       </View>
 
-      {isRunning || seconds > 0 && (
+      {(isRunning || seconds > 0) && (
         <TouchableOpacity style={styles.secondaryButton} onPress={savePhase}>
           <Text style={styles.primaryButtonText}>Tallenna työvaihe</Text>
         </TouchableOpacity>

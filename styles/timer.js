@@ -84,6 +84,6 @@ export const styles = StyleSheet.create({
   footer: {
     width: '80%',
     marginTop: 20,
-    marginBottom: 30,
+    marginBottom: 65,
   },
 });

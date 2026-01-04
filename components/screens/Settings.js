@@ -3,18 +3,25 @@ import React, {useEffect, useState} from 'react'
 import { styles } from '../../styles/settings'
 import TopBar from '../TopBar'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '../../service/contexts/NavigationContext';
+import { db } from "../../service/database/firebaseConfig"
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 
 export default function Settings() {
 
   const [username, setUsername] = useState('');
-  const [phaseName, setPhaseName] = useState('');
-  const [selectablePhases, setSelectablePhases] = useState([]);
+  const [data, setData] = useState([]);
+  const { setNavigate } = useNavigation()
 
   useEffect(() => {
     try {
       const fetchfromAsyncStorage = async() => {
         const value = await AsyncStorage.getItem('username');
+         const storedItems = await AsyncStorage.getItem('savedItems');
+        if (storedItems) {
+          const parsedItems = JSON.parse(storedItems);
+          setData(parsedItems);
+        }
         if (value !== null) {
           setUsername(value);
         }
@@ -57,6 +64,34 @@ export default function Settings() {
     }
   }
 
+  const saveData = async () => {
+    try {
+    await addDoc(collection(db, "ajastukset"), {
+      ...data,
+    });
+  } catch (error) {
+    console.log("Error saving data:", error);
+  }
+};
+
+const fetchData = async () => {
+   try {
+    const querySnapshot = await getDocs(collection(db, "ajastukset"));
+
+    const timings = querySnapshot.docs.map(doc => ({
+      ...doc.data(),
+    }));
+
+    let parsedTimings = Object.values(timings[0])
+    await AsyncStorage.setItem('savedItems', JSON.stringify(parsedTimings));
+
+    setNavigate('Controller');
+  } catch (error) {
+    console.log("Error fetching data:", error);
+    return [];
+  }
+}
+
   return (
   <View style = {styles.container}>
     <TopBar/>
@@ -73,11 +108,20 @@ export default function Settings() {
           numberOfLines={1}
           maxLength={25}
           />
-          <TouchableOpacity onPress={saveName} style={styles.iconButton}>
-            <Ionicons name='save' size={32} color={'white'}/>
-          </TouchableOpacity>
         </View>
+          <Button title='Tallenna' onPress={saveName}/>
     </View>
+
+    <View style= {styles.settingSection}>
+      <Text style={styles.sectionTitle}>Hae mittaukset pilvestä</Text>
+      <Button title='Hae' onPress={fetchData}/>
+    </View>
+
+    <View style= {styles.settingSection}>
+      <Text style={styles.sectionTitle}>Tallenna mittaukset pilveen</Text>
+      <Button title='Tallenna' onPress={saveData}/>
+    </View>
+
 
     <View style= {styles.settingSection}>
       <Text style={styles.sectionTitle}>Tyhjennä muisti</Text>
