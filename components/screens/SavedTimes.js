@@ -11,13 +11,12 @@ import * as MailComposer from 'expo-mail-composer';
 import * as FileSystem from 'expo-file-system/legacy';
 
 const SavedTimes = () => {
+  const { setExistingTitle, setExistingPhases, setSelectedItems } = useStates()
+  const { setNavigate } = useNavigation()
   const [savedItems, setSavedItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPrinter, setSelectedPrinter] = useState();
   const [filteredItems, setFilteredItems] = useState([]);
-
-  const { setNavigate } = useNavigation()
-  const { setExistingTitle, setExistingPhases, setSelectedItems } = useStates()
 
   useEffect(() => {
     const fetchSavedItems = async () => {
@@ -63,30 +62,23 @@ const SavedTimes = () => {
     setExistingTitle(mainTitle);
     setExistingPhases(phases);
     setNavigate('Timer');
-  };
+  }
     
-const deleteSelectedItems = async (itemToDelete) => {
+  const deleteSelectedItem = async (itemToDelete) => {
   const updatedItems = savedItems.filter(
     item => item.mainTitle !== itemToDelete.mainTitle
   );
   setSavedItems(updatedItems);
-  setSelectedItems([]);
+  
 
-  try {
-    await AsyncStorage.setItem("savedItems", JSON.stringify(updatedItems));
-    console.log("Saved Items After AsyncStorage Update:", await AsyncStorage.getItem("savedItems"));
-  } catch (error) {
-    console.error("Error deleting item from AsyncStorage:", error);
+  await AsyncStorage.setItem("savedItems", JSON.stringify(updatedItems));
   }
-};
 
-// Print function
   const print = async (item) => {
     const html = generateHtml(item);
     await Print.printAsync({ html, printerUrl: selectedPrinter?.url });
-  };
+  }
 
-  // Email function
   const email = async (item) => {
     const isAvailable = await MailComposer.isAvailableAsync();
     if (!isAvailable) return alert('Email is not available on this device');
@@ -104,14 +96,14 @@ const deleteSelectedItems = async (itemToDelete) => {
       body: 'PDF tiedosto mittauksesta.',
       attachments: [pdfUri],
     });
-  };
+  }
 
-const onPressAnalytics = (item) => {
-  setSelectedItems(item)
-     setTimeout(() => {
+  const onPressAnalytics = (item) => {
+    setSelectedItems(item)
+    setTimeout(() => {
     setNavigate("Analytics");
   }, 100);
-}
+  }
 
   
 
@@ -129,16 +121,15 @@ return (
   />
 
   <FlatList
-  data={filteredItems}
-  numColumns={1}
-  keyExtractor={(item, index) => index.toString()}
-  style={{marginTop:5, width:"100%"}}
-  showsHorizontalScrollIndicator={false}
-  ListEmptyComponent={
-  <Text style={styles.noItemsText}>Ei tallennettuja aikoja.</Text>
-  }
-  renderItem={({ item, index }) => (
-    <View style={[styles.savedItemCard]}>
+    data={filteredItems}
+    numColumns={1}
+    keyExtractor={(item, index) => index.toString()}
+    style={{marginTop:5, width:"100%"}}
+    showsHorizontalScrollIndicator={false}
+    ListEmptyComponent={ <Text style={styles.noItemsText}>Ei tallennettuja aikoja.</Text> }
+    renderItem={({ item, index }) => (
+
+  <View style={[styles.savedItemCard]}>
       <TouchableOpacity
         onPress={() => onPressSavedTimeCard(item.mainTitle, item.phases)}
         onLongPress={() => {
@@ -147,7 +138,7 @@ return (
           "Haluatko varmasti poistaa tämän kortin?",
           [
             { text: "Peruuta", style: "cancel" },
-            { text: "Poista", style: "destructive", onPress: () => deleteSelectedItems(item) }],
+            { text: "Poista", style: "destructive", onPress: () => deleteSelectedItem(item) }],
             { cancelable: true })
           }} delayLongPress={300}
       >

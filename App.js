@@ -8,18 +8,19 @@ import Navigation from './service/contexts/NavigationContext';
 import StateContext from './service/contexts/StateContext';
 import Analytics from './components/screens/Analytics';
 
+
 export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto"/>
       <StateContext>  
-          <Navigation>
-            <InvalidScreen/>
-            <Controller/>
-            <Timer/>
-            <Settings/>
-            <Analytics/>
-          </Navigation>
+        <Navigation>
+          <InvalidScreen/>
+          <Controller/>
+          <Timer/>
+          <Settings/>
+          <Analytics/>
+        </Navigation>
       </StateContext>
     </View>
   );
@@ -28,7 +29,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#09122C',
+    backgroundColor: '#121212',
     alignItems: 'center',
     justifyContent: 'center',
   }

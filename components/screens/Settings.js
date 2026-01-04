@@ -57,41 +57,12 @@ export default function Settings() {
     }
   }
 
-const savePhaseName = async () => {
-  try {
-    const savedNames = await AsyncStorage.getItem('phase_names');
-    let namesArray = savedNames ? JSON.parse(savedNames) : [];
-    namesArray.push(phaseName);
-    setSelectablePhases(namesArray);
-    await AsyncStorage.setItem('phase_names', JSON.stringify(namesArray));
-    setPhaseName('');
-  } catch (error) {
-    console.error('Virhe tallennettaessa vaihetta AsyncStorageen:', error);
-  }
-};
-
-const deletePhase = async (phase) => {
-  try {
-    const savedNames = await AsyncStorage.getItem('phase_names');
-    let namesArray = savedNames ? JSON.parse(savedNames) : [];
-    const updatedNames = namesArray.filter(item => item !== phase);
-    await AsyncStorage.setItem('phase_names', JSON.stringify(updatedNames));
-    setSelectablePhases(updatedNames);
-  } catch (error) {
-    console.error('Virhe poistettaessa vaihetta AsyncStorageista:', error);
-  }
-  }
-
   return (
   <View style = {styles.container}>
     <TopBar/>
-        <View style= {styles.settingContainer}>
-        <Text style={styles.labelText}>Tyhjennä muisti</Text>
-          <Button title='tyhjennä' onPress={clearStorage}/>
-        </View>
 
-    <View style= {[styles.settingContainer, {flexDirection:'column'}]}>
-      <Text style={[styles.labelText,{textAlign:'left', width:'100%'}]}>Mittauksissa käytettävä nimi</Text>
+    <View style= {[styles.settingSection, {flexDirection:'column'}]}>
+      <Text style={[styles.sectionTitle,{textAlign:'left', width:'100%'}]}>Mittauksissa käytettävä nimi</Text>
         <View style= {{flexDirection:'row'}}>
           <TextInput
           style={styles.input}
@@ -102,12 +73,17 @@ const deletePhase = async (phase) => {
           numberOfLines={1}
           maxLength={25}
           />
-          <TouchableOpacity onPress={saveName} style={styles.button}>
+          <TouchableOpacity onPress={saveName} style={styles.iconButton}>
             <Ionicons name='save' size={32} color={'white'}/>
           </TouchableOpacity>
         </View>
+    </View>
 
-    </View> 
+    <View style= {styles.settingSection}>
+      <Text style={styles.sectionTitle}>Tyhjennä muisti</Text>
+      <Button title='tyhjennä' onPress={clearStorage}/>
+    </View>
+    
   </View>
   )
 }

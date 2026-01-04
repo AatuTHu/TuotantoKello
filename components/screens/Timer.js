@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, FlatList } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
-
 import TopBar from '../TopBar';
 import { styles } from '../../styles/timer';
 import { useStates } from '../../service/contexts/StateContext';
 import { useNavigation } from '../../service/contexts/NavigationContext';
+import { View, Text, TouchableOpacity, TextInput, FlatList } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+import NativeTimerModule from '../../specs/NativeTimerModule';
+import { formatTime } from '../../service/Utilities';
 
-const TIMER_STORAGE_KEY = 'timer_start_time';
 
 const Timer = () => {
   const [seconds, setSeconds] = useState(0);
-  const [startTime, setStartTime] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
 
   const [mainTitle, setMainTitle] = useState('');
@@ -22,69 +21,50 @@ const Timer = () => {
 
   const mainTitleRef = useRef(null);
   const phaseRef = useRef(null);
-  const userRef = useRef(null);
+  const rafId = useRef(null);
 
-  const { existingTitle, existingPhases, setExistingTitle, setExistingPhases } =
-    useStates();
+  const { existingTitle, existingPhases, setExistingTitle, setExistingPhases } = useStates();
   const { setNavigate } = useNavigation();
 
   /* -------------------- LOAD DATA -------------------- */
 
   useEffect(() => {
-    loadTimer();
+    updateTime();
+    return () => cancelAnimationFrame(rafId.current); // cleanup
+  }, []);
+  
+  useEffect(() => {
+    const loadUserName = async () => {
+      const name = await AsyncStorage.getItem('username');
+      if (name) setUserName(name);
+    };
     loadUserName();
   }, []);
-
+  
   useEffect(() => {
     if (existingTitle) setMainTitle(existingTitle);
     if (existingPhases) setPhases(existingPhases);
   }, [existingTitle, existingPhases]);
-
-  /* -------------------- TIMER -------------------- */
-
-  useEffect(() => {
-    if (!isRunning || !startTime) return;
-
-    const interval = setInterval(() => {
-      setSeconds(Math.floor((Date.now() - startTime) / 1000));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isRunning, startTime]);
-
-  const loadTimer = async () => {
-    const stored = await AsyncStorage.getItem(TIMER_STORAGE_KEY);
-    if (!stored) return;
-
-    const parsed = Number(stored);
-    setStartTime(parsed);
-    setSeconds(Math.floor((Date.now() - parsed) / 1000));
-    setIsRunning(true);
+  
+  const updateTime = () => {
+    const ms = NativeTimerModule.getElapsedTime();
+    setSeconds(ms);
+    rafId.current = requestAnimationFrame(updateTime);
   };
 
-  const loadUserName = async () => {
-    const name = await AsyncStorage.getItem('username');
-    if (name) setUserName(name);
+  const startTimer = async () => {
+   setIsRunning(true);
+   NativeTimerModule.start();
   };
 
-  const toggleTimer = async () => {
-    if (isRunning) {
-      await AsyncStorage.removeItem(TIMER_STORAGE_KEY);
-      setIsRunning(false);
-      return;
-    }
-
-    const now = Date.now();
-    await AsyncStorage.setItem(TIMER_STORAGE_KEY, now.toString());
-    setStartTime(now);
-    setIsRunning(true);
-  };
+  const stopTimer = async () => {
+   setIsRunning(false);
+   NativeTimerModule.stop();
+  }
 
   const resetTimer = async () => {
-    setSeconds(0);
-    setStartTime(null);
-    setIsRunning(false);
-    await AsyncStorage.removeItem(TIMER_STORAGE_KEY);
+   setIsRunning(false);
+   NativeTimerModule.reset();
   };
 
   /* -------------------- PHASES -------------------- */
@@ -94,8 +74,10 @@ const Timer = () => {
       phaseRef.current?.focus();
       return;
     }
-
-    setPhases(prev => [...prev, { phaseName, time: seconds }]);
+    //Round milliseconds to seconds and fix the decimals to none
+    const sec = Number((seconds / 1000).toFixed(0))
+    
+    setPhases(prev => [...prev, { phaseName, time: sec}]);
     setPhaseName('');
     resetTimer();
   };
@@ -112,14 +94,7 @@ const Timer = () => {
       return;
     }
 
-    /*if (!userName.trim()) {
-      userRef.current?.focus();
-      return;
-    }*/
-
-    const totalTime =
-      phases.reduce((sum, p) => sum + p.time, 0) + seconds;
-
+    const totalTime = phases.reduce((sum, p) => sum + p.time, 0);
     const newItem = {
       mainTitle,
       phases,
@@ -135,11 +110,11 @@ const Timer = () => {
 
     await AsyncStorage.setItem('savedItems', JSON.stringify(items));
 
+    setPhases([]);
+    setMainTitle('');
+    setPhaseName('');
     setExistingTitle('');
     setExistingPhases([]);
-    setMainTitle('');
-    setPhases([]);
-    setPhaseName('');
 
     resetTimer();
     setNavigate('Controller');
@@ -149,13 +124,17 @@ const Timer = () => {
 
   const renderPhase = ({ item, index }) => (
     <View style={styles.phaseRow}>
+      <Text style={styles.phaseText}>{item.phaseName}:</Text>
       <Text style={styles.phaseText}>
-        {item.phaseName}: {Math.floor(item.time / 60)}:
-        {String(item.time % 60).padStart(2, '0')}
+        {formatTime(item.time)}
       </Text>
-      <TouchableOpacity onPress={() => deletePhase(index)}>
-        <Ionicons name="remove-circle" size={40} color="#BE3144" />
-      </TouchableOpacity>
+
+      <Ionicons 
+      onPress={() => deletePhase(index)} 
+      name="remove-circle-outline"
+      size={40} 
+      color="#F44336"
+      />
     </View>
   );
 
@@ -185,21 +164,27 @@ const Timer = () => {
 
       <View style={styles.timerBox}>
         <Text style={styles.timerText}>
-          {String(Math.floor(seconds / 3600)).padStart(2, '0')}:
-          {String(Math.floor((seconds % 3600) / 60)).padStart(2, '0')}:
-          {String(seconds % 60).padStart(2, '0')}
+          {NativeTimerModule.getFormattedTime()}
         </Text>
 
-        <TouchableOpacity onPress={isRunning ? resetTimer : toggleTimer}>
           <Ionicons
-            name={isRunning ? 'refresh' : 'play'}
+            onPress={isRunning ? stopTimer : startTimer}
+            name={isRunning ? 'stop' : 'play'}
+            color={isRunning ? "#F44336" : "#005B41"}
             size={55}
-            color="#BE3144"
           />
-        </TouchableOpacity>
+       
+          {seconds > 0 && 
+            <Ionicons
+              onPress={resetTimer}
+              name="refresh"
+              size={50}
+              color="#FF9800"
+            />
+          }
       </View>
 
-      {isRunning && (
+      {isRunning || seconds > 0 && (
         <TouchableOpacity style={styles.secondaryButton} onPress={savePhase}>
           <Text style={styles.primaryButtonText}>Tallenna työvaihe</Text>
         </TouchableOpacity>

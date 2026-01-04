@@ -8,34 +8,17 @@ export default function States({children}) {
   const [existingTitle, setExistingTitle] = useState("");
   const [existingPhases, setExistingPhases] = useState([]);
   const [existingMainTime, setExistingMainTime] = useState("")
-  const [deletesOn, setDeletesOn] = useState(false)
   const [selectedItems, setSelectedItems] = useState([]);
   const [existingUserName,setExistingUserName] = useState("")
 
-  useEffect(() => {
-    const loadToggleState = async () => {
-      try {
-        const storedState = await AsyncStorage.getItem('deletesOn');
-        if (storedState !== null) {
-          setDeletesOn(JSON.parse(storedState));
-        }
-      } catch (error) {
-        console.error('Virhe ladattaessa tallennettua tilaa:', error);
-      }
-    };
-    loadToggleState();
-  }, []);
-  
     return (
       <StateContext.Provider value={{ 
-        setExistingMainTime,
+       setExistingMainTime,
        setExistingPhases, 
        setExistingTitle, 
        existingTitle, 
        existingPhases, 
-       existingMainTime, 
-       deletesOn, 
-       setDeletesOn, 
+       existingMainTime,
        existingUserName, 
        setExistingUserName,
        selectedItems,

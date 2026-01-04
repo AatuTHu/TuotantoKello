@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     nappula: {
       flexDirection:"row",
       marginTop:Constants.statusBarHeight,
-      backgroundColor: '#1E3E62',
+      backgroundColor: '#065a9eff',
       padding: 10,
       width: '100%',
       alignItems:'center',

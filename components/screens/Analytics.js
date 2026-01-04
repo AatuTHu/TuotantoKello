@@ -1,43 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, ScrollView, Switch, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, ScrollView, TouchableOpacity } from "react-native";
 import TopBar from "../TopBar";
 import { useStates } from "../../service/contexts/StateContext";
-
-const formatTime = (totalSeconds) => {
-  if (totalSeconds < 60) {
-    return `${totalSeconds} s`;
-  } else {
-    const hour = Math.floor(totalSeconds / 3600);
-    const min = Math.floor((totalSeconds % 3600) / 60);
-    const sec = totalSeconds % 60;
-    if (hour > 0) {
-      return `${hour} h ${min} min ${sec} s`;
-    } else {
-      return sec > 0 ? `${min} min ${sec} s` : `${min} min`;
-    }
-  }
-};
-
-const formatTimeInDays = (totalSeconds) => {
-  if (totalSeconds < 60) {
-    return ``;
-  } else {
-    const day = totalSeconds / 3600 / 7.5;
-      return `${day.toFixed(0)} päivää`;
-    
-  }
-}
+import { formatTimeWithUnits, formatTimeInDays } from "../../service/Utilities"
+import { styles } from "../../styles/analytics"
 
 export default function Analytics() {
+
   const { selectedItems } = useStates();
   const [workerCount, setWorkerCount] = useState("1");
   const [count, setCount] = useState("10");
-  const [useOptimization, setUseOptimization] = useState(false);
-  const [optimizationPercent, setOptimizationPercent] = useState(5);
-
-  // Uusi tila useille vain kerran laskettaville vaiheille
   const [singleCountPhases, setSingleCountPhases] = useState([]);
-
   const productCount = parseInt(count, 10);
   const isValidCount = !isNaN(productCount) && productCount > 0;
 
@@ -78,13 +51,6 @@ export default function Analytics() {
   // Jaetaan työntekijöiden määrällä
   const timeWithWorkers = totalTime / effectiveWorkerNum;
 
-  // Optimoinnin kerroin
-  const optimizationFactor = 1 - optimizationPercent / 100;
-
-  // Lopullinen aika optimoinnin huomioiden
-  const optimizedTotalTime = useOptimization
-    ? timeWithWorkers * optimizationFactor
-    : timeWithWorkers;
 
   return (
     <View style={styles.container}>
@@ -138,7 +104,7 @@ export default function Analytics() {
                   onPress={() => toggleSinglePhase(phase.phaseName)}
                 >
                   <Text style={[styles.phaseText, { color: isSelected ? "#000" : "#ccc" }]}>
-                    {phase.phaseName}: {formatTime(phase.time)}
+                    {phase.phaseName}: {formatTimeWithUnits(phase.time)}
                   </Text>
                 </TouchableOpacity>
               );
@@ -146,7 +112,7 @@ export default function Analytics() {
           </ScrollView>
 
           <Text style={[styles.result, { marginTop: 10 }]}>
-            Yhden tuotteen valmistusaika: {formatTime(perUnitTime)}
+            Yhden tuotteen valmistusaika: {formatTimeWithUnits(perUnitTime)}
           </Text>
         </View>
 
@@ -156,10 +122,10 @@ export default function Analytics() {
               Kokonaisaika ({productCount} kpl, {effectiveWorkerNum} työntekijää):
             </Text>
             <Text style={[styles.result, { color: "lightblue" }]}>
-              {formatTime(optimizedTotalTime.toFixed(0))}
+              {formatTimeWithUnits(timeWithWorkers)}
             </Text>
              <Text style={[styles.result, { color: "lightblue" }]}>
-              {formatTimeInDays(optimizedTotalTime.toFixed(0))}
+              {formatTimeInDays(timeWithWorkers)}
             </Text>
           </View>
         )}
@@ -174,36 +140,3 @@ export default function Analytics() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: "#222",
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#fff",
-    paddingHorizontal: 10,
-  },
-  label: { fontSize: 16, color: "#fff", marginBottom: 5 },
-  input: {
-    borderWidth: 2,
-    borderColor: "#ccc",
-    borderRadius: 3,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    fontSize: 17,
-    backgroundColor: "#fff",
-  },
-  result: { fontSize: 16, marginTop: 10, color: "#fff" },
-  phaseText: { fontSize: 17, color: "#ccc", marginLeft: 10 },
-  formula: {
-    fontSize: 13,
-    color: "#ccc",
-    fontStyle: "italic",
-    marginTop: 5,
-  },
-});
