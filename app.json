@@ -13,11 +13,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "userInterfaceStyle": "automatic",
-      "supportsTablet": true,
-      "bundleIdentifier": "com.aulis.TuotantoKello"
+      "supportsTablet": true
     },
     "android": {
+      "minSdkVersion": 24,
       "softwareKeyboardLayoutMode": "pan",
       "userInterfaceStyle": "automatic",
       "adaptiveIcon": {
@@ -35,8 +34,7 @@
       }
     },
     "plugins": [
-      "expo-font",
-      "expo-build-properties"
+      "expo-font"
     ]
   }
 }
