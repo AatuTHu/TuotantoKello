@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
   label: {
     color: '#fff',
     fontSize: 18,
-    marginBottom: 6,
+    marginBottom: 2,
   },
 
   input: {
@@ -54,12 +54,12 @@ export const styles = StyleSheet.create({
   },
 
   secondaryButton: {
-    backgroundColor: '#df9100ff',
+    backgroundColor: '#2196F3',
     padding: 14,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 15,
-    width: '80%'
+    width: '46%'
   },
 
   list: {
@@ -69,8 +69,11 @@ export const styles = StyleSheet.create({
 
   phaseRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+    alignItems:"center",
+    justifyContent: 'space-around',
+    backgroundColor:"#292828ff",
+    marginBottom: 5,
+    paddingVertical:5,
   },
 
   phaseText: {
@@ -81,6 +84,6 @@ export const styles = StyleSheet.create({
   footer: {
     width: '80%',
     marginTop: 20,
-    marginBottom: 30,
+    marginBottom: 65,
   },
 });

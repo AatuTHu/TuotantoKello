@@ -15,7 +15,34 @@ const formatTime = (time) => {
     const minutes = Math.floor((time % 3600) / 60).toString().padStart(2, '0');
     const seconds = (time % 60).toString().padStart(2, '0');   
     return `${hours}:${minutes}:${seconds}`;
+}
+
+const formatTimeWithUnits = (totalSeconds) => {
+  if (totalSeconds < 60) {
+    return `${totalSeconds} s`;
+  } else {
+    const hour = Math.floor(totalSeconds / 3600);
+    const min = Math.floor((totalSeconds % 3600) / 60);
+    const sec = totalSeconds % 60;
+    if (hour > 0) {
+      return `${hour} h ${min} min ${sec} s`;
+    } else {
+      return sec > 0 ? `${min} min ${sec} s` : `${min} min`;
+    }
   }
+};
+
+
+const formatTimeInDays = (totalSeconds) => {
+  if (totalSeconds < 60) {
+    return ``;
+  } else {
+    const day = totalSeconds / 3600 / 7.5;
+      return `${day.toFixed(0)} päivää`;
+    
+  }
+}
+
 
 // HTML generator for printing/email
 const generateHtml = (item) => {
@@ -60,4 +87,4 @@ const generateHtml = (item) => {
     `;
   };
 
-export {makeTimeStamp, formatTime, generateHtml}
+export {makeTimeStamp, formatTime, generateHtml, formatTimeWithUnits, formatTimeInDays}

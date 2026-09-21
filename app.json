@@ -16,6 +16,9 @@
       "supportsTablet": true
     },
     "android": {
+      "minSdkVersion": 24,
+      "softwareKeyboardLayoutMode": "pan",
+      "userInterfaceStyle": "automatic",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

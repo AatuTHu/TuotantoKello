@@ -1,65 +1,67 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
+
 export const styles = StyleSheet.create({
   container: {
-  flex: 1,
-  alignItems: 'left',
-  width: '100%',
+    flex: 1,
+    backgroundColor: '#121212',
+    width: '100%',
   },
-  text: {
-    fontSize: 25,
+  settingSection: {
+    marginBottom: 30,
+    width: "90%",
+    alignSelf: 'center',
+  },
+  sectionTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#fff',
-    textAlign: 'center'
+    color: '#FFFFFF',
+    marginBottom: 12,
   },
-  labelText: {
-    fontSize: 21,
-    color: '#ffff',
-    marginBottom: 10,
-    marginTop: 5,
-  },
-  settingContainer:{
+  row: {
     flexDirection: 'row',
-    justifyContent:'space-between',
-    padding: 15,
     alignItems: 'center',
   },
   input: {
-    borderBottomWidth: 1,
-    borderColor: 'white',
-    padding: 12,
-    marginBottom: 10,
-    width: '80%',
-    fontSize: 18,
-    color: 'white',
-    borderRadius: 3,
+    backgroundColor: '#1E1E1E',
+    color: '#FFFFFF',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    flex: 1,
   },
-  button:{
-    backgroundColor: '#BE3144',
+  iconButton: {
+    backgroundColor: '#4CAF50',
     padding: 10,
-    borderRadius: 100,
-    marginBottom: 10,
-    marginTop: 10,
+    borderRadius: 50,
+    marginLeft: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  tagButton:{
-    backgroundColor: '#747070b4',
+  tagButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#333333',
     paddingVertical: 6,
     paddingHorizontal: 12,
-    margin: 5,
     borderRadius: 20,
-    alignSelf: 'flex-start', // ettei veny koko riville
-    flexDirection: 'row', // mahdollistaa ikonit + tekstin
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2 // Android-varjo
+    margin: 4,
   },
   tagText: {
-  color: '#fff',
-  fontSize: 18,
-  fontWeight: '500',
-  fontWeight:"bold"
-}
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  clearButton: {
+    backgroundColor: '#F44336',
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  clearButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
